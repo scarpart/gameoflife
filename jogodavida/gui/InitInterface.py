@@ -1,0 +1,64 @@
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox
+from tkinter import simpledialog
+
+from PIL import Image, ImageTk
+from constants import INIT_HEIGHT, INIT_WIDTH
+
+class InitInterface:
+    def __init__(self, master):
+        self.master = master
+
+        self.image = Image.open("media/initpage.jpg")  
+
+        self.image = self.image.resize((INIT_WIDTH, INIT_HEIGHT), Image.ANTIALIAS) 
+        self.photo_image = ImageTk.PhotoImage(self.image)
+
+        self.master.geometry(f"{INIT_WIDTH}x{INIT_HEIGHT}") 
+
+        self.frame = Frame(self.master)
+        self.frame.pack(fill="both", expand=True)
+
+        self.canvas = Canvas(self.frame, width=INIT_WIDTH, height=INIT_HEIGHT)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.create_image(0, 0, image=self.photo_image, anchor="nw")
+
+        self.player_name = ""
+
+        self.button = Button(self.frame, text="Play", font=("Arial", 20, "bold"), fg="#FFFFFF", bg="#198754", activebackground="#4cae4c", activeforeground="#FFFFFF", cursor="hand2", padx=10, pady=10)
+        self.button.pack(side="bottom", pady=20)
+        self.button.place(relx=0.5, rely=0.55, anchor="center")
+
+    def get_player_name(self) -> str:
+        player_name = "" 
+        while True:
+            player_name = simpledialog.askstring("Input", "Enter your name.", parent=self.master)
+            # Check if the name is not null
+            if player_name: 
+                break
+            messagebox.showerror("Invalid input", "Your username cannot be null. Please enter a valid username.")
+        self.player_name = player_name
+        return player_name
+
+    def add_placeholder(self, event):
+        if self.name_entry.get() == 'Enter your name':
+            self.name_entry.delete(0, END)
+    
+    def clear_placeholder(self, event):
+        if self.name_entry.get() == '':
+            self.name_entry.insert(0, 'Enter your name')
+
+    def set_waiting_other_players(self):
+        style = ttk.Style()
+        style.configure("Blue.TButton",
+                foreground="white",
+                background="#2596be",
+                font=("Arial", 20, "bold"),
+                padding=10)
+        style.map("C.TButton",
+                  foreground=[],
+                  background=[]
+                  )
+        self.name_entry.destroy()
+        self.button.configure(text="Waiting for other players...", command=None, style="Blue.TButton", cursor='watch')
